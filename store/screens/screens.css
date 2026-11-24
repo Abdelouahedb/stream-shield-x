@@ -1,0 +1,45 @@
+/* Shared layout for the 1280x800 store screenshots and the 440x280 promo tile. */
+* { box-sizing: border-box; }
+body {
+  margin: 0; width: 1280px; height: 800px; overflow: hidden;
+  background: #eceef1; color: #14161b;
+  font: 18px/1.5 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  display: grid; grid-template-columns: 430px 1fr; align-items: center; gap: 56px;
+  padding: 0 72px;
+}
+h1 {
+  margin: 0 0 20px; font: 600 58px/1.02 Bahnschrift, "DIN Alternate", system-ui, sans-serif;
+  font-stretch: 88%; letter-spacing: -.01em;
+}
+p { margin: 0; color: #5d6470; max-width: 30ch; }
+kbd {
+  padding: 1px 8px; border-radius: 6px; font: 600 16px/1.6 "Segoe UI", system-ui, sans-serif;
+  color: #14161b; background: #fff; border: 1px solid #d6dae0; border-bottom-width: 3px;
+}
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; font-weight: 600; }
+.brand img { width: 32px; height: 32px; }
+
+/* A generic browser window with no real site branding. */
+.window {
+  position: relative; height: 640px; border-radius: 12px; overflow: hidden;
+  background: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / .08), 0 24px 60px rgb(20 22 27 / .18);
+}
+.chrome { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; background: #f3f4f6; border-bottom: 1px solid #e5e7eb; }
+.chrome i { width: 11px; height: 11px; border-radius: 50%; background: #d6dae0; }
+.chrome span { margin-left: 16px; flex: 1; height: 24px; border-radius: 6px; background: #fff; border: 1px solid #e5e7eb; }
+
+.feed { width: 560px; margin-left: 40px; border-left: 1px solid #eff3f4; border-right: 1px solid #eff3f4; height: 600px; }
+.post { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #eff3f4; color: #0f1419; font-size: 15px; line-height: 1.35; }
+.av { flex: none; width: 40px; height: 40px; border-radius: 50%; }
+.who { display: flex; gap: 4px; align-items: baseline; white-space: nowrap; }
+.who b { font-weight: 700; }
+.who span { color: #536471; }
+.text { margin-top: 2px; }
+.redact { color: transparent !important; border-radius: 3px; background: #14161b; }
+.redact-av { background: #14161b !important; }
+
+.popup {
+  position: absolute; top: 48px; right: 24px; width: 344px; height: 720px;
+  border: 0; border-radius: 10px; transform: scale(.8); transform-origin: top right;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / .1), 0 18px 48px rgb(20 22 27 / .28);
+}

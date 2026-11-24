@@ -111,6 +111,12 @@ Check your X tab and the account menu before every stream.
 | `background.js` | Keyboard shortcuts and the toolbar badge |
 | `popup.html`, `popup.css`, `popup.js` | The popup with the live preview |
 
+## Publishing to the Chrome Web Store
+
+- `python scripts/package.py` builds the upload ZIP in `dist/`, with `manifest.json` at its root and nothing but the files the extension needs.
+- `store/listing.md` has the store description and every answer for the Privacy practices tab, ready to paste.
+- `store/images/` holds four 1280×800 screenshots and the 440×280 promo tile. `store/screens/` has the pages they are rendered from.
+
 ## Privacy
 
-The only permission is `storage`. Settings stay in your browser's local extension storage. There are no network requests, analytics or remote code.
+The only permission is `storage`. Settings stay in your browser's local extension storage. There are no network requests, analytics or remote code. See [PRIVACY.md](PRIVACY.md).

@@ -1,0 +1,131 @@
+<!-- Generated from popup.html for store screenshots. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stream Shield for X</title>
+  <link rel="stylesheet" href="../../popup.css">
+  <script src="mock.js"></script>
+  <script src="../../settings.js" defer></script>
+  <script src="../../popup.js" defer></script>
+</head>
+<body data-mode="hide" style="overflow:hidden">
+  <form id="settings" autocomplete="off">
+    <fieldset id="controls" disabled>
+      <header class="head">
+        <div>
+          <h1>Stream Shield</h1>
+          <p id="state" class="state">Off</p>
+        </div>
+        <label class="power">
+          <span class="sr-only">Shield</span>
+          <input id="enabled" type="checkbox" role="switch">
+        </label>
+      </header>
+
+      <!-- A mock of an X post header. Each part is the control that decides whether it is covered. -->
+      <section class="stage" aria-labelledby="stage-title">
+        <div class="stage-top">
+          <h2 id="stage-title">What viewers see</h2>
+          <label class="part bell" title="Notification and message counts">
+            <input id="counts" type="checkbox" checked>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.4 16h15.2L18 12.6V9a6 6 0 0 0-6-6Zm-2.4 15a2.4 2.4 0 0 0 4.8 0"/></svg>
+            <span class="bit count" style="--i:3" aria-hidden="true">3</span>
+            <span class="sr-only">Cover notification and message counts</span>
+          </label>
+        </div>
+        <div class="post">
+          <label class="part">
+            <input id="avatar" type="checkbox" checked>
+            <span class="bit avatar" style="--i:0" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="15.5" r="6.5"/><path d="M7.5 34c2-6.5 6.8-10 12.5-10s10.5 3.5 12.5 10"/></svg>
+            </span>
+            <span class="sr-only">Cover profile photo</span>
+          </label>
+          <div class="post-body">
+            <div class="byline">
+              <label class="part">
+                <input id="name" type="checkbox" checked>
+                <span class="bit name" style="--i:1">Your Name</span>
+                <span class="sr-only">Cover display name</span>
+              </label>
+              <label class="part">
+                <input id="handle" type="checkbox" checked>
+                <span class="bit handle" style="--i:2">@yourhandle</span>
+                <span class="sr-only">Cover @handle</span>
+              </label>
+              <span class="time" aria-hidden="true">2h</span>
+            </div>
+            <p class="post-text">Going live in five minutes.</p>
+          </div>
+        </div>
+        <p class="stage-hint">Click a part to choose whether it’s covered. Post text stays visible.</p>
+      </section>
+
+      <div class="status-bar">
+        <p id="status" class="status" role="status">Loading…</p>
+        <button id="open-x" class="link" type="button" hidden>Open X</button>
+      </div>
+
+      <fieldset class="group">
+        <legend>Cover style</legend>
+        <div class="segmented">
+          <label><input name="mode" type="radio" value="hide" checked><span>Hide</span></label>
+          <label><input name="mode" type="radio" value="blur"><span>Blur</span></label>
+          <label><input name="mode" type="radio" value="redact"><span>Redact</span></label>
+        </div>
+        <div id="blur-row" class="blur-row" hidden>
+          <label for="blur">Strength</label>
+          <input id="blur" type="range" min="4" max="30" step="1" value="14">
+          <output id="blur-value" for="blur">14</output>
+        </div>
+      </fieldset>
+
+      <div class="rows">
+        <label class="row">
+          <span>
+            Cover message previews
+            <small>The messages drawer in the corner of X.</small>
+          </span>
+          <input id="messages" type="checkbox" role="switch">
+        </label>
+        <label class="row">
+          <span>
+            Show a “Shielded” tag on X
+            <small>Viewers will see it too.</small>
+          </span>
+          <input id="badge" type="checkbox" role="switch">
+        </label>
+        <details class="row account">
+          <summary>
+            <span>Your account</span>
+            <span id="detected" class="detected">Not found yet</span>
+          </summary>
+          <div class="fallback">
+            <label for="fallback">If your account isn’t found, enter your handle.</label>
+            <div class="fallback-row">
+              <input id="fallback" type="text" maxlength="16" placeholder="@handle" spellcheck="false" autocapitalize="none">
+              <button id="save-handle" type="button">Save</button>
+            </div>
+            <p id="fallback-status" role="status" class="note"></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="curtain-zone">
+        <button id="curtain" class="curtain" type="button" aria-pressed="false">
+          <span id="curtain-label">Cover the whole tab</span>
+          <kbd id="curtain-key">Alt+Shift+C</kbd>
+        </button>
+        <p class="curtain-note">Shows a “Be right back” screen over X until you uncover it.</p>
+      </div>
+    </fieldset>
+  </form>
+
+  <footer class="foot">
+    <span><kbd id="shield-key">Alt+Shift+S</kbd> turns the shield on or off</span>
+    <button id="shortcuts" class="link" type="button">Change shortcuts</button>
+  </footer>
+</body>
+</html>

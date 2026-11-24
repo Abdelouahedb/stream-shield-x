@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="screens.css">
+<style>
+  .styles { display: grid; gap: 20px; }
+  .style { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 24px;
+    padding: 28px 32px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / .06); }
+  .style h2 { margin: 0; font: 600 26px/1 Bahnschrift, system-ui, sans-serif; font-stretch: 88%; }
+  .style .post { border: 0; padding: 0; font-size: 18px; }
+  .style .av { width: 48px; height: 48px; background: #f4b860; }
+  .hide .x { opacity: .06; }
+  .blur .x { filter: blur(6px); }
+</style></head>
+<body>
+  <div>
+    <div class="brand"><img src="../../icons/shield-128.png" alt="">Stream Shield for X</div>
+    <h1>Hide, blur or redact.</h1>
+    <p>Pick the style that suits your stream. Only your own name, handle and photo are covered. Everyone else stays visible.</p>
+  </div>
+  <div class="styles">
+    <div class="style hide"><h2>Hide</h2><div class="post"><div class="av x"></div><div><div class="who"><b class="x">Your Name</b><span class="x">@yourhandle</span><span>· 2h</span></div><div class="text">Going live in five minutes.</div></div></div></div>
+    <div class="style blur"><h2>Blur</h2><div class="post"><div class="av x"></div><div><div class="who"><b class="x">Your Name</b><span class="x">@yourhandle</span><span>· 2h</span></div><div class="text">Going live in five minutes.</div></div></div></div>
+    <div class="style"><h2>Redact</h2><div class="post"><div class="av redact-av"></div><div><div class="who"><b class="redact">Your Name</b><span class="redact">@yourhandle</span><span>· 2h</span></div><div class="text">Going live in five minutes.</div></div></div></div>
+  </div>
+</body></html>
