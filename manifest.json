@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Stream Shield for X",
+  "version": "2.1.0",
+  "description": "Hide, blur or redact your name, @handle and avatar on X while screen sharing.",
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "toggle-shield": {
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
+      "description": "Turn the shield on or off"
+    },
+    "toggle-curtain": {
+      "suggested_key": {
+        "default": "Alt+Shift+C",
+        "mac": "Alt+Shift+C"
+      },
+      "description": "Cover or uncover the whole X tab"
+    }
+  },
+  "action": {
+    "default_title": "Stream Shield for X",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/shield-16.png",
+      "32": "icons/shield-32.png"
+    }
+  },
+  "icons": {
+    "16": "icons/shield-16.png",
+    "32": "icons/shield-32.png",
+    "48": "icons/shield-48.png",
+    "128": "icons/shield-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "css": ["shield.css"],
+      "js": ["settings.js", "shield.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
