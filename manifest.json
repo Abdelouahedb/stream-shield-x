@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Stream Shield for X",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Hide, blur or redact your name, @handle and avatar on X while screen sharing.",
   "permissions": ["storage"],
   "background": {

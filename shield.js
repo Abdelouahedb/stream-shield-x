@@ -6,6 +6,10 @@
   ].join(',');
   const textSelector = 'span,div[dir="auto"],[data-testid="UserName"] div';
   const identityHeader = '.x-middot-group,[data-testid="User-Name"],[data-testid="UserName"]';
+  const accountTrigger = '[data-testid="SideNav_AccountSwitcher_Button"],[aria-label="Account menu" i]';
+  const identityText = `a,title,h1,${identityHeader},${accountTrigger},
+    button[aria-haspopup="menu"],[role="menu"],[role="dialog"],[data-testid="Dropdown"],
+    [data-testid="DMDrawerHeader"]`;
   const profileSections = new Set([
     'with_replies', 'media', 'highlights', 'likes', 'articles', 'photo', 'header',
     'followers', 'verified_followers', 'following', 'subscriptions',
@@ -46,10 +50,7 @@
   }
 
   function accountTriggers() {
-    const labeled = [...document.querySelectorAll([
-      '[data-testid="SideNav_AccountSwitcher_Button"]',
-      '[aria-label="Account menu" i]',
-    ].join(','))];
+    const labeled = [...document.querySelectorAll(accountTrigger)];
     if (labeled.length) return labeled;
     return [...document.querySelectorAll('button[data-slot="xds-menu-trigger"][aria-haspopup="menu"]:has(img[alt^="@"])')]
       .filter(element => !element.closest('main,article'));
@@ -134,7 +135,7 @@
 
   function onOwnProfile() {
     const [, handle, section] = location.pathname.toLowerCase().replace(/\/$/, '').split('/');
-    return handle === account.handle && (!section || profileSections.has(section));
+    return Boolean(account.handle) && handle === account.handle && (!section || profileSections.has(section));
   }
 
   function protectProfile(mark) {
@@ -162,14 +163,14 @@
     }
   }
 
-  function protectPageIdentity(mark) {
+  function protectPageIdentity(mark, scope = document) {
     const { handle, name, avatars } = account;
     if (!handle) return;
     const ownLink = [
       `a[href="/${handle}" i]`, `a[href^="/${handle}?" i]`, `a[href="/${handle}/" i]`,
       `a[href="https://x.com/${handle}" i]`, `a[href="https://twitter.com/${handle}" i]`,
     ].join(',');
-    for (const anchor of document.querySelectorAll(ownLink)) {
+    for (const anchor of scope.querySelectorAll(ownLink)) {
       const label = text(anchor);
       if (handleFromText(label) === handle) {
         mark(anchor, 'handle');
@@ -183,15 +184,16 @@
         }
       }
     }
-    for (const element of document.querySelectorAll(avatarSelector)) {
-      if (handleFromText(element.getAttribute('alt') ?? '') === handle ||
-          avatars.has(avatarKey(element)) ||
-          element.closest(ownLink) ||
-          element.closest(`[data-testid="UserAvatar-Container-${handle}" i]`)) {
-        mark(element, 'avatar');
+    if (preferences.avatar) {
+      const owner = `:is(${ownLink},[data-testid="UserAvatar-Container-${handle}" i])`;
+      const avatar = `:is(${avatarSelector})`;
+      const ownedAvatars = [`img[alt="@${handle}" i]`, `${owner} ${avatar}`, `${owner}${avatar}`];
+      for (const key of avatars) {
+        const asset = `pbs.twimg.com/profile_images/${key}/`;
+        ownedAvatars.push(`img[src*="${asset}"]`, `img[srcset*="${asset}"]`, `[style*="${asset}"]`);
       }
+      for (const element of scope.querySelectorAll(ownedAvatars.join(','))) mark(element, 'avatar');
     }
-    protectProfile(mark);
   }
 
   function protectCounts(mark) {
@@ -217,7 +219,7 @@
       // Cover everything beside the header's branch so the drawer can still be opened and closed.
       for (let node = header; node !== drawer && node.parentElement; node = node.parentElement) {
         for (const sibling of node.parentElement.children) {
-          if (sibling !== node && sibling.offsetHeight > 0) mark(sibling, 'messages');
+          if (sibling !== node) mark(sibling, 'messages');
         }
       }
     }
@@ -242,32 +244,17 @@
     }
   }
 
-  function applyShield() {
-    if (!preferences || !document.documentElement) return;
+  function collectMasks(protect) {
     const next = new Map();
-    function mark(element, field) {
+    protect((element, field) => {
       if (preferences[field] && element?.isConnected) next.set(element, field);
-    }
+    });
+    return next;
+  }
 
-    if (preferences.enabled) {
-      const triggers = accountTriggers();
-      const parts = readAccount(triggers);
-      for (const part of parts) protectParts(part, mark);
-      protectMenus(triggers, mark);
-      protectPageIdentity(mark);
-      protectCounts(mark);
-      protectMessages(mark);
-      document.documentElement.setAttribute('data-xss-mode', preferences.mode);
-      const blur = `${preferences.blur}px`;
-      if (document.documentElement.style.getPropertyValue('--xss-blur') !== blur) {
-        document.documentElement.style.setProperty('--xss-blur', blur);
-      }
-    } else {
-      document.documentElement.removeAttribute('data-xss-mode');
-    }
-
+  function updateMasks(next, inScope = () => true) {
     for (const element of masked.keys()) {
-      if (next.has(element)) continue;
+      if (next.has(element) || (element.isConnected && !inScope(element))) continue;
       element.removeAttribute(maskAttribute);
       masked.delete(element);
     }
@@ -275,11 +262,39 @@
       if (element.getAttribute(maskAttribute) !== field) element.setAttribute(maskAttribute, field);
       masked.set(element, field);
     }
+  }
+
+  function applyShield() {
+    const root = document.documentElement;
+    if (!preferences || !root) return;
+    const next = collectMasks(mark => {
+      if (!preferences.enabled) return;
+      const triggers = accountTriggers();
+      const parts = readAccount(triggers);
+      for (const part of parts) protectParts(part, mark);
+      protectMenus(triggers, mark);
+      protectPageIdentity(mark);
+      protectProfile(mark);
+      if (preferences.counts) protectCounts(mark);
+      if (preferences.messages) protectMessages(mark);
+    });
+
+    if (preferences.enabled) {
+      if (root.getAttribute('data-xss-mode') !== preferences.mode) {
+        root.setAttribute('data-xss-mode', preferences.mode);
+      }
+      const blur = `${preferences.blur}px`;
+      if (root.style.getPropertyValue('--xss-blur') !== blur) root.style.setProperty('--xss-blur', blur);
+    } else if (root.hasAttribute('data-xss-mode')) {
+      root.removeAttribute('data-xss-mode');
+    }
+
+    updateMasks(next);
     protectTitle();
     protectTitleCount();
     updateIndicator();
     updateCurtain();
-    document.documentElement.setAttribute('data-xss-ready', '');
+    if (!root.hasAttribute('data-xss-ready')) root.setAttribute('data-xss-ready', '');
   }
 
   let indicator;
@@ -335,10 +350,69 @@
     if (!curtain.isConnected) document.documentElement.append(curtain);
   }
 
-  const observer = new MutationObserver(applyShield);
+  const dirtyArticles = new Set();
+  let needsFullScan = false;
+  let scheduledFrame;
+
+  function applyQueuedChanges() {
+    scheduledFrame = undefined;
+    if (needsFullScan) {
+      needsFullScan = false;
+      applyShield();
+    } else {
+      const next = collectMasks(mark => {
+        for (const article of dirtyArticles) {
+          if (article.isConnected) protectPageIdentity(mark, article);
+        }
+      });
+      updateMasks(next, element => {
+        for (let article = element.closest('article'); article; article = article.parentElement?.closest('article')) {
+          if (dirtyArticles.has(article)) return true;
+        }
+        return false;
+      });
+      updateIndicator();
+    }
+    dirtyArticles.clear();
+  }
+
+  function queueChanges(records) {
+    if (!needsFullScan) {
+      for (const record of records) {
+        const { target } = record;
+        const element = target.nodeType === Node.ELEMENT_NODE ? target : target.parentElement;
+        const article = element?.closest('article');
+        const inDrawer = preferences.messages && element?.closest('[data-testid="DMDrawer"]');
+        if (isUnrelatedText(record, element, article)) continue;
+        if (!article || inDrawer) {
+          needsFullScan = true;
+          dirtyArticles.clear();
+          break;
+        }
+        dirtyArticles.add(article);
+      }
+    }
+    if (scheduledFrame === undefined && (needsFullScan || dirtyArticles.size)) {
+      scheduledFrame = requestAnimationFrame(applyQueuedChanges);
+    }
+  }
+
+  function isUnrelatedText(record, element, article) {
+    if (!element || record.type === 'attributes') return false;
+    if (record.type === 'childList' && [...record.addedNodes, ...record.removedNodes]
+      .some(node => node.nodeType === Node.ELEMENT_NODE)) return false;
+    if (element.closest(identityText)) return false;
+    return article || !onOwnProfile() || !element.closest('main,[role="main"]');
+  }
+
+  const observer = new MutationObserver(queueChanges);
   function setPreferences(value) {
     preferences = streamShieldSettings(value);
     observer.disconnect();
+    if (scheduledFrame !== undefined) cancelAnimationFrame(scheduledFrame);
+    scheduledFrame = undefined;
+    needsFullScan = false;
+    dirtyArticles.clear();
     if (preferences.enabled) {
       observer.observe(document, {
         subtree: true,
